@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>Weltwunder-Klassifikation</title>
+  <style>
+    :root {
+      --bg-color: white;
+      --text-color: black;
+      --table-bg: #f2f2f2;
+      --accent: #007acc;
+    }
+    body.dark {
+      --bg-color: #1e1e1e;
+      --text-color: #e0e0e0;
+      --table-bg: #2c2c2c;
+      --accent: #66afe9;
+    }
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      font-family: sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 800px;
+      margin: 40px auto;
+      padding: 20px;
+    }
+    h1, h2, h3 {
+      text-align: center;
+    }
+    .card {
+      background-color: var(--table-bg);
+      border: 1px solid var(--text-color);
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 30px;
+    }
+    input[type="file"], button {
+      font-size: 1em;
+      padding: 8px;
+    }
+    button {
+      background-color: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      opacity: 0.9;
+    }
+    table, th, td {
+      border: 1px solid var(--text-color);
+      border-collapse: collapse;
+      padding: 6px;
+      text-align: center;
+      width: 100%;
+    }
+    #top1Result {
+      font-size: 1.2em;
+      color: green;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+    #loading {
+      font-style: italic;
+      color: orange;
+      text-align: center;
+      margin-top: 10px;
+    }
+    .high { background-color: #d4edda; }
+    .medium { background-color: #fff3cd; }
+    .low { background-color: #f8d7da; }
+    #darkModeToggle {
+      position: fixed;
+      top: 10px;
+      right: 20px;
+    }
+    #languageToggle {
+      position: fixed;
+      top: 10px;
+      left: 20px;
+    }
+    #preview {
+      display: block;
+      max-width: 300px;
+      margin: 10px auto;
+    }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <button id="darkModeToggle">🌙 Dark Mode</button>
+  <select id="languageToggle">
+    <option value="de">🇩🇪 Deutsch</option>
+    <option value="en">🇬🇧 English</option>
+  </select>
+
+  <div class="container">
+    <h1>🏛️ Weltwunder-Klassifikation</h1>
+
+    <div class="card">
+      <form id="uploadForm" enctype="multipart/form-data">
+        <label for="image">Bild auswählen:</label><br><br>
+        <input type="file" id="image" name="image" accept="image/*" required><br><br>
+        <img id="preview" src="#" alt="Vorschau"><br>
+        <button type="submit">Analysieren</button>
+      </form>
+      <p id="loading" style="display: none;">🌀 Analysiere Bild... bitte warten</p>
+    </div>
+
+    <div class="card">
+      <h2>📊 Top-5 Klassifikation:</h2>
+      <h3 id="top1Result">Erkanntes Weltwunder: –</h3>
+
+      <table id="resultTable" style="display: none;">
+        <thead>
+          <tr>
+            <th>Ort</th>
+            <th>Wahrscheinlichkeit</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+
+      <canvas id="chart" width="400" height="250" style="margin-top: 20px;"></canvas>
+    </div>
+  </div>
+
+  <script>
+    const labelMap = {
+      "burj_khalifa": { de: "Burj Khalifa", en: "Burj Khalifa" },
+      "chichen_itza": { de: "Chichen Itza", en: "Chichen Itza" },
+      "christ_the_reedemer": { de: "Christusstatue", en: "Christ the Redeemer" },
+      "eiffel_tower": { de: "Eiffelturm", en: "Eiffel Tower" },
+      "great_wall_of_china": { de: "Chinesische Mauer", en: "Great Wall of China" },
+      "machu_pichu": { de: "Machu Picchu", en: "Machu Picchu" },
+      "pyramids_of_giza": { de: "Pyramiden von Gizeh", en: "Pyramids of Giza" },
+      "roman_colosseum": { de: "Kolosseum", en: "Roman Colosseum" },
+      "statue_of_liberty": { de: "Freiheitsstatue", en: "Statue of Liberty" },
+      "stonehenge": { de: "Stonehenge", en: "Stonehenge" },
+      "taj_mahal": { de: "Taj Mahal", en: "Taj Mahal" },
+      "venezuela_angel_falls": { de: "Salto Ángel", en: "Angel Falls" }
+    };
+
+    let currentLang = "de";
+
+    document.getElementById("darkModeToggle").addEventListener("click", () => {
+      document.body.classList.toggle("dark");
+    });
+
+    document.getElementById("languageToggle").addEventListener("change", (e) => {
+      currentLang = e.target.value;
+    });
+
+    const form = document.getElementById('uploadForm');
+    const fileInput = document.getElementById('image');
+    const preview = document.getElementById('preview');
+    const resultTable = document.getElementById('resultTable');
+    const resultBody = resultTable.querySelector('tbody');
+    const top1Result = document.getElementById('top1Result');
+    const loadingIndicator = document.getElementById("loading");
+    let chartInstance = null;
+
+    fileInput.addEventListener('change', function () {
+      const file = fileInput.files[0];
+      if (file) {
+        preview.src = URL.createObjectURL(file);
+        preview.style.display = 'block';
+      } else {
+        preview.src = '#';
+        preview.style.display = 'none';
+      }
+    });
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const formData = new FormData(form);
+      loadingIndicator.style.display = "block";
+
+      try {
+        const response = await fetch('/analyze', {
+          method: 'POST',
+          body: formData
+        });
+
+        if (!response.ok) throw new Error("Fehler: " + response.status);
+
+        const results = await response.json();
+        loadingIndicator.style.display = "none";
+
+        const topResults = results
+          .sort((a, b) => b.probability - a.probability)
+          .slice(0, 5);
+
+        resultBody.innerHTML = "";
+        const labels = [];
+        const data = [];
+
+        topResults.forEach(item => {
+          const prob = item.probability;
+          const map = labelMap[item.label.toLowerCase()];
+          const translatedLabel = map ? map[currentLang] : item.label;
+          labels.push(translatedLabel);
+          data.push((prob * 100).toFixed(1));
+
+          const row = document.createElement("tr");
+          row.className = prob >= 0.7 ? "high" : prob >= 0.4 ? "medium" : "low";
+
+          const classCell = document.createElement("td");
+          classCell.textContent = translatedLabel;
+          row.appendChild(classCell);
+
+          const probCell = document.createElement("td");
+          probCell.textContent = data[data.length - 1] + " %";
+          row.appendChild(probCell);
+
+          resultBody.appendChild(row);
+        });
+
+        if (topResults.length > 0) {
+          const top1 = topResults[0];
+          const map = labelMap[top1.label.toLowerCase()];
+          const top1Label = map ? map[currentLang] : top1.label;
+          const top1Prob = (top1.probability * 100).toFixed(1) + " %";
+          top1Result.textContent = "🏆 Erkanntes Weltwunder: " + top1Label + " (" + top1Prob + ")";
+        }
+
+        resultTable.style.display = 'table';
+
+        if (chartInstance) chartInstance.destroy();
+        const ctx = document.getElementById('chart').getContext('2d');
+
+        const barColors = topResults.map(r => {
+          if (r.probability >= 0.7) return '#28a745';
+          if (r.probability >= 0.4) return '#ffc107';
+          return '#dc3545';
+        });
+
+        chartInstance = new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: labels,
+            datasets: [{
+              label: 'Wahrscheinlichkeit (%)',
+              data: data,
+              backgroundColor: barColors,
+              borderRadius: 6,
+            }]
+          },
+          options: {
+            responsive: true,
+            plugins: {
+              tooltip: {
+                callbacks: {
+                  title: (context) => {
+                    const index = context[0].dataIndex;
+                    const original = topResults[index].label;
+                    const map = labelMap[original.toLowerCase()];
+                    const translated = map ? map[currentLang] : original;
+                    return translated + " (" + original + ")";
+                  }
+                }
+              },
+              legend: { display: false }
+            },
+            scales: {
+              y: {
+                beginAtZero: true,
+                max: 100,
+                ticks: {
+                  color: getComputedStyle(document.body).getPropertyValue('--text-color')
+                }
+              },
+              x: {
+                ticks: {
+                  color: getComputedStyle(document.body).getPropertyValue('--text-color')
+                }
+              }
+            }
+          }
+        });
+
+      } catch (err) {
+        loadingIndicator.style.display = "none";
+        alert("Fehler beim Analysieren: " + err.message);
+        console.error(err);
+      }
+    });
+  </script>
+</body>
+</html>
