@@ -15,31 +15,71 @@ Es nutzt die **Deep Java Library (DJL)** mit PyTorch zur Inferenz eines trainier
 
 ---
 
-## 🧠 Verwendete Technologien
+## 🗂️ Projektstruktur
 
-| Bereich           | Tools                                 |
-|-------------------|----------------------------------------|
-| Backend           | Java 21, Spring Boot                   |
-| ML-Inferenz       | Deep Java Library (DJL), PyTorch       |
-| Modellformat      | `.params` + `synset.txt`               |
-| Konfigurationsdateien | `serving.properties`, `config.properties` |
-| Containerisierung | Docker                                |
-| Deployment        | Docker Hub, Azure App Service          |
+```plaintext
+wonders-classifier/
+├── [README.md](http://_vscodecontentref_/1)                         # Projektbeschreibung mit Setup, Screenshots und API-Doku
+├── Dockerfile                        # Dockerfile für die Spring Boot App
+├── [Dockerfile.model](http://_vscodecontentref_/2)                  # (Optional) Dockerfile für DJL-Serving oder Modell
+├── mvnw, [mvnw.cmd](http://_vscodecontentref_/3)                    # Maven Wrapper für Linux/macOS und Windows
+├── [pom.xml](http://_vscodecontentref_/4)                           # Projektdefinition mit Dependencies (Spring Boot, DJL etc.)
+├── target/                           # Generierte Build-Dateien (nach Maven-Build)
+├── wonders/                          # Trainingsdaten für das Modell (nicht Teil der Abgabe)
+│
+├── models/                           # Modellverzeichnis (für Inference & Deployment)
+│   ├── wonders-classifier-0001.params  # Trainiertes ResNet-Modell mit DJL gespeichert
+│   ├── synset.txt                    # Liste aller Klassen (eine pro Zeile)
+│   ├── serving.properties            # Konfiguration für DJL-Serving (optional)
+│   └── config.properties             # Weitere Modell-Parameter (optional)
+│
+├── src/
+│   └── main/
+│       ├── java/
+│       │   └── ch/
+│       │       └── zhaw/
+│       │           └── wonders/
+│       │               ├── dto/                  # Datenübertragungsobjekte (DTOs)
+│       │               │   ├── ClassificationResult.java  # Ergebnis-Objekt mit Label & Wahrscheinlichkeit
+│       │               │   ├── Label.java                 # Einzelnes Label mit Zusatzinfos
+│       │               │   └── Model.java                 # Modell-Metadaten für die API
+│       │               │
+│       │               ├── service/              # Businesslogik für ML & DJL
+│       │               │   ├── Training.java              # Training des Modells (lokal mit DJL)
+│       │               │   ├── Inference.java             # Modell laden + Bildklassifikation
+│       │               │   └── Models.java                # Modellstruktur (ResNet) + Hilfsmethoden
+│       │               │
+│       │               ├── controller/           # REST-API-Controller
+│       │               │   └── ClassificationController.java  # `/analyze`, `/ping`, `/labels`, ...
+│       │               │
+│       │               └── WeltwunderClassifierApplication.java # Einstiegspunkt für Spring Boot
+│       │
+│       └── resources/              # (UI, HTML, JS, evtl. Templates)
+│
+├── test/                            # (derzeit leer – optional für Unit Tests)
+└── [HELP.md](http://_vscodecontentref_/5)                          # Auto-generiertes Maven-Hilfe-File (nicht notwendig)
 
 ---
 
-## 🗂️ Projektstruktur
+### 🧠 Verwendete Technologien
 
-wonders-classifier/
-├── models/
-│   ├── wonders-classifier-0001.params   # Modell
-│   ├── synset.txt                       # Klassen
-│   ├── serving.properties               # DJL-Serving Konfiguration
-│   └── config.properties                # weitere Konfigurationen
-├── Dockerfile                           # Spring Boot App
-├── Dockerfile.model                     # DJL Serving Image
-├── src/main/java/…                    # Spring Boot REST-API
-└── README.md
+| Bereich              | Tools                                                 |
+|----------------------|-------------------------------------------------------|
+| **Backend**          | Java 21, Spring Boot                                  |
+| **ML-Inferenz**      | Deep Java Library (DJL), PyTorch                      |
+| **Modellformat**     | `.params` + `synset.txt`                              |
+| **Konfigurationsdateien** | `serving.properties`, `config.properties`       |
+| **Containerisierung**| Docker                                                |
+| **Deployment**       | Docker Hub, Azure App Service                         |
+
+---
+
+### 📊 Dataset
+
+Das Dataset für das Training des Modells stammt von Kaggle.  
+Es enthält Bilder von Sehenswürdigkeiten, die in verschiedene Klassen unterteilt sind.
+
+**Kaggle-Link:** [Hier klicken](https://www.kaggle.com/datasets/balabaskar/wonders-of-the-world-image-classification) *(Bitte den tatsächlichen Link einfügen)*
 
 ---
 
