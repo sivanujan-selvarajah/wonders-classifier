@@ -1,9 +1,11 @@
 FROM deepjavalibrary/djl-serving:0.31.0
 
-# Erstelle Zielverzeichnis
-RUN mkdir -p /opt/ml/models/wonders-classifier
+RUN mkdir -p /opt/ml/model/wonders-classifier
 
-# Kopiere Modell-Dateien hinein
+
+# 🔍 Debug: Zeige den Inhalt des lokalen models/ Verzeichnisses
+RUN echo ">>> DEBUG: Inhalt von /models im Build-Kontext:" && ls -l models || echo "models not found"
+
 COPY models/wonders-classifier-0001.params /opt/ml/model/wonders-classifier/
 COPY models/synset.txt /opt/ml/model/wonders-classifier/
-COPY models/model.properties /opt/ml/model/wonders-classifier/
+COPY models/serving.properties /opt/ml/model/wonders-classifier/
