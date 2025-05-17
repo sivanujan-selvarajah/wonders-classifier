@@ -146,8 +146,8 @@ az webapp create \
 	•	JavaScript fetch() POSTet Bild an /analyze
 	•	Vorschau des Bildes und JSON-Antwort im Browser
 
-    Autor
 
+Autor
 Sivanujan Selvarajah
 ZHAW – FS2025 – Modul Model Deployment & Maintenance
 https://github.com/sivanujan-selvarajah/wonders-classifier
