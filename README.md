@@ -1,11 +1,11 @@
-# 🏛️ Wonders Image Classifier – DJL + Spring Boot
+# Wonders Image Classifier – DJL + Spring Boot
 
 Dieses Projekt implementiert eine Webservice-Anwendung zur Klassifikation von Sehenswürdigkeiten („Weltwundern“) anhand von Bildern.  
 Es nutzt die **Deep Java Library (DJL)** mit PyTorch zur Inferenz eines trainierten CNN-Modells und stellt die Funktionalität über eine **Spring Boot REST-API** bereit.
 
 ---
 
-## ✨ Features
+## Features
 
 - Klassifikation von Sehenswürdigkeiten (Weltwunder) via Bild-Upload
 - DJL Serving als separates Modell-Backend
@@ -15,7 +15,7 @@ Es nutzt die **Deep Java Library (DJL)** mit PyTorch zur Inferenz eines trainier
 
 ---
 
-## 🗂️ Projektstruktur
+## Projektstruktur
 
 ```plaintext
 wonders-classifier/
@@ -61,7 +61,7 @@ wonders-classifier/
 ```
 ---
 
-### 🧠 Verwendete Technologien
+### Verwendete Technologien
 
 | Bereich              | Tools                                                 |
 |----------------------|-------------------------------------------------------|
@@ -74,7 +74,7 @@ wonders-classifier/
 
 ---
 
-### 📊 Dataset
+### Dataset
 
 Das Dataset für das Training des Modells stammt von Kaggle.  
 Es enthält Bilder von Sehenswürdigkeiten, die in verschiedene Klassen unterteilt sind.
@@ -83,7 +83,7 @@ Es enthält Bilder von Sehenswürdigkeiten, die in verschiedene Klassen untertei
 
 ---
 
-## ⚙️ Setup & Lokale Ausführung
+## Setup & Lokale Ausführung
 
 ### Voraussetzungen
 
@@ -106,7 +106,7 @@ curl http://localhost:8082/ping
 curl -X POST http://localhost:8081/predictions/wonders-classifier -T test.jpg
 ```
 
-## 🧪 REST API – Übersicht
+## REST API – Übersicht
 
 | Methode | Pfad       | Beschreibung                                |
 |---------|------------|---------------------------------------------|
@@ -115,7 +115,7 @@ curl -X POST http://localhost:8081/predictions/wonders-classifier -T test.jpg
 | GET     | `/models`  | Listet verfügbare Modelle im System         |
 | POST    | `/analyze` | Klassifiziert hochgeladenes Bild (Form-Upload) |
 
-☁️ Azure Deployment
+Azure Deployment
 
 Spring Boot App (Frontend/API)
 ```
@@ -132,7 +132,7 @@ az webapp create \
 ```
 
 
-  🧾 Modellinformationen
+    Modellinformationen
 
 	•	Selbst trainiertes CNN mit DJL Training API
 	•	Ausgabeformat .params + synset.txt
@@ -140,12 +140,13 @@ az webapp create \
 	•	Optimiert für CPU-Inferenz (Azure-kompatibel)
 
 
-    📸 UI-Integration (optional)
+    UI-Integration
+
 	•	Datei: src/main/resources/static/index.html
 	•	JavaScript fetch() POSTet Bild an /analyze
 	•	Vorschau des Bildes und JSON-Antwort im Browser
 
-    👨‍💻 Autor
+    Autor
 
 Sivanujan Selvarajah
 ZHAW – FS2025 – Modul Model Deployment & Maintenance
