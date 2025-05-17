@@ -58,7 +58,7 @@ wonders-classifier/
 │
 ├── test/                            # (derzeit leer – optional für Unit Tests)
 └── [HELP.md](http://_vscodecontentref_/5)                          # Auto-generiertes Maven-Hilfe-File (nicht notwendig)
-
+```
 ---
 
 ### 🧠 Verwendete Technologien
@@ -104,6 +104,7 @@ docker run -p 8081:8080 wonders-model
 
 curl http://localhost:8082/ping
 curl -X POST http://localhost:8081/predictions/wonders-classifier -T test.jpg
+```
 
 ## 🧪 REST API – Übersicht
 
@@ -117,7 +118,7 @@ curl -X POST http://localhost:8081/predictions/wonders-classifier -T test.jpg
 ☁️ Azure Deployment
 
 Spring Boot App (Frontend/API)
-
+```
 az webapp create \
   --resource-group wonders-rg-we \
   --plan wonders-plan-we \
@@ -128,20 +129,7 @@ az webapp create \
   --resource-group wonders-rg-we \
   --name wonders-classifier-app \
   --settings WEBSITES_PORT=8080
-
-  DJL Serving (Backend/Model)
-
-  az webapp create \
-  --resource-group wonders-rg-we \
-  --plan wonders-plan-we \
-  --name wonders-model-app \
-  --deployment-container-image-name sivanujan26/djl-wonders-model:latest
-
-    
-az webapp config appsettings set \
-  --resource-group wonders-rg-we \
-  --name wonders-model-app \
-  --settings WEBSITES_PORT=8080
+```
 
 
   🧾 Modellinformationen
